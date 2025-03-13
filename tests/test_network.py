@@ -6,6 +6,7 @@ from unittest.mock import patch, MagicMock
 import socket
 import ssl
 from datetime import datetime, timedelta
+from diagnostics import __version__
 
 from diagnostics.network.network import (
     NetworkMetrics,
@@ -362,7 +363,9 @@ class TestSSLCertMonitor(unittest.TestCase):
         mock_cert.not_valid_before_utc = datetime.now()
         mock_cert.not_valid_after_utc = datetime.now() + timedelta(days=365)
         mock_cert.serial_number = 123456789
-        mock_cert.version = MagicMock(name='v3')
+        mock_version = MagicMock()
+        mock_version.name = 'v3'
+        mock_cert.version = mock_version
 
         mock_context = MagicMock()
         mock_socket = MagicMock()
@@ -381,6 +384,10 @@ class TestSSLCertMonitor(unittest.TestCase):
             cert_info2 = self.monitor.check_certificate('google.com')
             self.assertEqual(cert_info1, cert_info2)
             self.assertEqual(cert_info1['serial_number'], 123456789)
+            self.assertEqual(cert_info1['version'], 'v3')
+            self.assertIn('days_until_expiry', cert_info1)
+            self.assertGreater(cert_info1['days_until_expiry'], 0)
+            self.assertLessEqual(cert_info1['days_until_expiry'], 365)
 
 
 if __name__ == '__main__':

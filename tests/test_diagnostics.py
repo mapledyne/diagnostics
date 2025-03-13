@@ -116,5 +116,33 @@ class TestDiagnostics(unittest.TestCase):
             mock_network_main.assert_called_once()
 
 
+class TestVersion(unittest.TestCase):
+    """Test cases for version information."""
+
+    def test_version_format(self):
+        """Test that version string follows semantic versioning."""
+        from diagnostics import __version__
+        import re
+        
+        # Check version format (major.minor.patch)
+        version_pattern = r'^\d+\.\d+\.\d+$'
+        self.assertTrue(
+            re.match(version_pattern, __version__),
+            f"Version {__version__} does not follow semantic versioning format"
+        )
+        
+        # Check version components are integers
+        major, minor, patch = map(int, __version__.split('.'))
+        self.assertGreaterEqual(major, 0)
+        self.assertGreaterEqual(minor, 0)
+        self.assertGreaterEqual(patch, 0)
+
+    def test_version_import(self):
+        """Test that version can be imported from package."""
+        from diagnostics import __version__
+        self.assertIsInstance(__version__, str)
+        self.assertGreater(len(__version__), 0)
+
+
 if __name__ == '__main__':
     unittest.main() 

@@ -1,0 +1,8 @@
+[tool.setuptools_scm]
+write_to = "diagnostics/_version.py"
+version_scheme = "post-release"
+local_scheme = "node-and-date"
+
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=7.0"]
+build-backend = "setuptools.build_meta" 

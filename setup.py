@@ -4,13 +4,20 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", "r", encoding="utf-8") as fh:
-    requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
+    requirements = [
+        line.strip() 
+        for line in fh 
+        if line.strip() and not line.startswith("#")
+    ]
 
 setup(
     name="diagnostics",
-    version="0.1.0",
+    use_scm_version=True,
     author="Michael Knowles",
-    description="A comprehensive diagnostics and logging module with performance monitoring capabilities",
+    description=(
+        "A comprehensive diagnostics and logging module with "
+        "performance monitoring capabilities"
+    ),
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/mapledyne/diagnostics",
@@ -36,6 +43,8 @@ setup(
             "black>=22.0",
             "isort>=5.0",
             "flake8>=4.0",
+            "setuptools_scm>=7.0",
         ],
     },
+    setup_requires=["setuptools_scm>=7.0"],
 )

@@ -316,6 +316,37 @@ class TestSSLCertMonitor(unittest.TestCase):
             self.assertIsNotNone(cert_info)
             self.assertEqual(cert_info['serial_number'], 123456789)
             self.assertEqual(cert_info['version'], 'v3')
+            self.assertIn('days_until_expiry', cert_info)
+            self.assertGreater(cert_info['days_until_expiry'], 0)
+            self.assertLessEqual(cert_info['days_until_expiry'], 365)
+
+    def test_check_certificate_expired(self):
+        """Test certificate check with expired certificate."""
+        mock_cert = MagicMock()
+        mock_cert.subject = MagicMock()
+        mock_cert.issuer = MagicMock()
+        mock_cert.not_valid_before_utc = datetime.now() - timedelta(days=400)
+        mock_cert.not_valid_after_utc = datetime.now() - timedelta(days=35)
+        mock_cert.serial_number = 123456789
+        mock_version = MagicMock()
+        mock_version.name = 'v3'
+        mock_cert.version = mock_version
+
+        mock_context = MagicMock()
+        mock_socket = MagicMock()
+        mock_ssock = MagicMock()
+        mock_ssock.getpeercert.return_value = b'cert_data'
+
+        with patch('ssl.create_default_context', return_value=mock_context), \
+             patch('socket.create_connection', return_value=mock_socket), \
+             patch('cryptography.x509.load_der_x509_certificate', return_value=mock_cert):
+            
+            mock_context.wrap_socket.return_value.__enter__.return_value = mock_ssock
+            
+            cert_info = self.monitor.check_certificate('google.com')
+            self.assertIsNotNone(cert_info)
+            self.assertIn('days_until_expiry', cert_info)
+            self.assertLess(cert_info['days_until_expiry'], 0)
 
     def test_check_certificate_failure(self):
         """Test certificate check failure."""

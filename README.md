@@ -77,6 +77,34 @@ set_log_directory("logs")  # Enable file logging
 max_logs(5)  # Keep only the 5 most recent log directories
 ```
 
+### Certificate Validity Check Example
+
+Here's a simple example that checks a certificate's validity period:
+
+```python
+from diagnostics.network import SSLCertMonitor
+
+def check_cert_validity(hostname: str) -> None:
+    """Check and display certificate validity information."""
+    monitor = SSLCertMonitor()
+    cert_info = monitor.check_certificate(hostname)
+    
+    if cert_info is None:
+        print(f"Failed to check certificate for {hostname}")
+        return
+        
+    days = cert_info['days_until_expiry']
+    if days > 0:
+        print(f"Certificate for {hostname} is valid for {days} more days")
+        print(f"Expires on: {cert_info['not_after']}")
+    else:
+        print(f"Certificate for {hostname} expired {abs(days)} days ago")
+        print(f"Expired on: {cert_info['not_after']}")
+
+# Example usage
+check_cert_validity('google.com')
+```
+
 ## Command Line Interface
 
 The package includes a CLI for network diagnostics:

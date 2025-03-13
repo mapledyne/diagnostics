@@ -323,6 +323,10 @@ class SSLCertMonitor:
             except (IndexError, AttributeError):
                 return default
 
+        # Calculate days until expiration
+        now = datetime.now()
+        days_until_expiry = (cert.not_valid_after_utc - now).days
+
         return {
             "subject": {
                 "common_name": get_attr_value(subject, NameOID.COMMON_NAME),
@@ -334,6 +338,7 @@ class SSLCertMonitor:
             },
             "not_before": cert.not_valid_before_utc.isoformat(),
             "not_after": cert.not_valid_after_utc.isoformat(),
+            "days_until_expiry": days_until_expiry,
             "serial_number": cert.serial_number,
             "version": cert.version.name,
         }
